@@ -18,6 +18,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.Key;
+import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
@@ -266,15 +267,20 @@ public class RustCompilerDriver {
 
 			@Override
 			public void handleFailure(UUID sessionId, CmdlineRemoteProto.Message.Failure failure) {
+				Boolean hasErrors = false;
 				if (failure.hasStacktrace()) {
+					hasErrors = true;
 					compileContext.addMessage(CompilerMessageCategory.ERROR, failure.getDescription(), null, -1, -1);
 				} else {
-					parseErrors(failure.getDescription());
+					hasErrors = parseErrors(failure.getDescription());
 				}
-				compileContext.putUserData(COMPILE_SERVER_BUILD_STATUS, ExitStatus.ERRORS);
+
+				if (hasErrors)
+					compileContext.putUserData(COMPILE_SERVER_BUILD_STATUS, ExitStatus.ERRORS);
 			}
 
-			private void parseErrors(String description) {
+			private Boolean parseErrors(String description) {
+				Boolean hasErrors = false;
 				Map<String, VirtualFile> files = new HashMap<String, VirtualFile>();
 				String[] lines = description.split("\n");
 				for (String line : lines) {
@@ -286,6 +292,9 @@ public class RustCompilerDriver {
 						continue;
 					}
 					String fileName = line.substring(0, idx);
+					if(SystemInfo.isWindows)
+						fileName = fileName.replace('\\', '/');
+
 					VirtualFile file = files.get(fileName);
 					if (file == null) {
 						file = myProject.getBaseDir().findFileByRelativePath(fileName);
@@ -318,9 +327,10 @@ public class RustCompilerDriver {
 						if (message.startsWith("error: ")) {
 							errorType = CompilerMessageCategory.ERROR;
 							message = message.substring("error: ".length());
+							hasErrors = true;
 						} else if (message.startsWith("warning: ")) {
 							errorType = CompilerMessageCategory.WARNING;
-							message = message.substring("error: ".length());
+							message = message.substring("warning: ".length());
 						} else {
 							errorType = CompilerMessageCategory.INFORMATION;
 						}
@@ -328,6 +338,8 @@ public class RustCompilerDriver {
 					} catch (Exception ex) {
 					}
 				}
+
+				return hasErrors;
 			}
 
 			@Override

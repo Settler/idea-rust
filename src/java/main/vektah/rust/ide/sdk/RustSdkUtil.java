@@ -7,6 +7,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.projectRoots.Sdk;
 import com.intellij.openapi.roots.ProjectRootManager;
+import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.vfs.VirtualFile;
 
 import java.io.File;
@@ -62,7 +63,9 @@ public class RustSdkUtil {
             LOG.error("Directory does not exist.");
 			return null;
 		}
-		File rustc = new File(parent, "rustc");
+
+		String rustFileName = SystemInfo.isWindows ? "rustc.exe" : "rustc";
+		File rustc = new File(parent, rustFileName);
         if (!rustc.exists()) {
             LOG.error(rustc.getAbsolutePath() + " does not exist");
             return null;
