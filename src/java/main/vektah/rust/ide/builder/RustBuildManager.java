@@ -457,6 +457,7 @@ public class RustBuildManager implements com.intellij.openapi.components.Applica
 		cmdLine.setExePath(RustSdkUtil.testRustSdk(defaultSdk.getHomePath()).pathRustc);
 		cmdLine.addParameter(rustConfiguration.mainFile);
 		cmdLine.addParameters("-o", outputPathUrl.concat("/").concat(rustConfiguration.getName()));
+		cmdLine.addParameters("-O3");
 
 		final Process process = cmdLine.createProcess();
 

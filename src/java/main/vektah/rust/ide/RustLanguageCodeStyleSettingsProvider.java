@@ -71,7 +71,7 @@ public class RustLanguageCodeStyleSettingsProvider
 		CommonCodeStyleSettings.IndentOptions indentOptions =
 				defaultSettings.initIndentOptions();
 
-		indentOptions.USE_TAB_CHARACTER = true;
+		indentOptions.USE_TAB_CHARACTER = false;
 		indentOptions.INDENT_SIZE = 4;
 		indentOptions.TAB_SIZE = 4;
 		indentOptions.CONTINUATION_INDENT_SIZE = 8;
