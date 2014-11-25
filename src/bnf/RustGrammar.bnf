@@ -468,7 +468,7 @@ private mod_contents ::= ( use
 
 
 // STATIC
-static_item ::= (comment | attribute)* visibility? 'static' 'mut'? itemName ':' type '=' expr ';' {pin=3 mixin="vektah.rust.psi.mixin.item.RustStaticItemMixin"}
+static_item ::= (comment | attribute)* visibility? 'static' 'mut'? itemName ':' type '=' 'b'?(expr) ';' {pin=3 mixin="vektah.rust.psi.mixin.item.RustStaticItemMixin"}
 
 
 // TYPE
